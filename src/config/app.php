@@ -123,4 +123,21 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'link_expiration_days' => 7,
+    'link_token_length' => 20,
+
+    'game_min_value' => 1,
+    'game_max_value' => 1000,
+    'game_win_thresholds' => [
+        'high' => 900,
+        'medium' => 600,
+        'low' => 300,
+    ],
+    'game_win_multipliers' => [
+        'high' => 0.70,
+        'medium' => 0.50,
+        'low' => 0.30,
+        'default' => 0.10,
+    ],
+
 ];

@@ -15,7 +15,7 @@ class PlayGameAction
     public function execute(GameLink $link): GameResult
     {
         try {
-            $number = random_int(1, 1000);
+            $number = random_int(config('app.game_min_value', 1), config('app.game_max_value', 1000));
         } catch (\Exception $e) {
             throw new \Exception('Failed to generate random number', 500);
         }
@@ -23,14 +23,14 @@ class PlayGameAction
         $winAmount = 0;
 
         if ($result) {
-            if ($number > 900) {
-                $winAmount = $number * 0.70;
-            } elseif ($number > 600) {
-                $winAmount = $number * 0.50;
-            } elseif ($number > 300) {
-                $winAmount = $number * 0.30;
+            if ($number > config('app.game_win_thresholds.high', 900)) {
+                $winAmount = $number * config('app.game_win_multipliers.high', 0.70);
+            } elseif ($number > config('app.game_win_thresholds.medium', 600)) {
+                $winAmount = $number * config('app.game_win_multipliers.medium', 0.50);
+            } elseif ($number > config('app.game_win_thresholds.low', 300)) {
+                $winAmount = $number * config('app.game_win_multipliers.low', 0.30);
             } else {
-                $winAmount = $number * 0.10;
+                $winAmount = $number * config('app.game_win_multipliers.default', 0.10);
             }
         }
         

@@ -17,7 +17,7 @@ class GameLinkFactory extends Factory
             'user_id' => User::factory(),
             'token' => $this->faker->sha256(),
             'is_active' => true,
-            'expired_at' => Carbon::now()->addDays(7),
+            'expired_at' => Carbon::now()->addDays(config('app.link_expiration_days', 7)),
         ];
     }
 }

@@ -16,7 +16,7 @@ class GameResultFactory extends Factory
         return [
             'user_id' => User::factory(),
             'game_link_id' => GameLink::factory(),
-            'random_number' => $this->faker->numberBetween(1, 1000),
+            'random_number' => $this->faker->numberBetween(config('app.game_min_value', 1), config('app.game_max_value', 1000)),
             'result' => $this->faker->boolean(),
             'win_amount' => $this->faker->randomFloat(2, 0, 1000),
         ];

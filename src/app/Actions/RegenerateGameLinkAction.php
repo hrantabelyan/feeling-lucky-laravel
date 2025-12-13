@@ -16,12 +16,12 @@ class RegenerateGameLinkAction
     public function execute(GameLink $link): GameLink
     {
         try {
-            $token = Str::random(20);
+            $token = Str::random(config('app.link_token_length', 20));
             $hashedToken = hash('sha256', $token);
 
             $this->gameLinkRepository->update($link, [
                 'token' => $hashedToken,
-                'expired_at' => Carbon::now()->addDays(7),
+                'expired_at' => Carbon::now()->addDays(config('app.link_expiration_days', 7)),
                 'is_active' => true,
             ]);
 
