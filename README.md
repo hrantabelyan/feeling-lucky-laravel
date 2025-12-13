@@ -72,7 +72,7 @@ docker compose exec php php artisan test tests/Feature/Api/GameControllerTest.ph
 
 ## Technical Details
 
-- **Backend**: Laravel 11 (PHP 8.5)
-- **Frontend**: Vue.js 3
+- **Backend**: Laravel 12 (PHP 8.5)
+- **Frontend**: Vue 3
 - **Database**: MySQL 8.0
 - **Server**: Nginx 1.29
