@@ -1,7 +1,7 @@
 services:
   php:
     build:
-      context: ./docker/php
+      context: ./.docker/php
     container_name: luckygame_php
     volumes:
       - ./src:/var/www/html
@@ -40,7 +40,7 @@ services:
       - NGINX_ENVSUBST_FILTER=^DOMAIN|SSL_CERT|SSL_KEY$
     volumes:
       - ./src:/var/www/html
-      - ./docker/nginx/default-ssl.conf.template:/etc/nginx/templates/default.conf.template
+      - ./.docker/nginx/default-ssl.conf.template:/etc/nginx/templates/default.conf.template
       - ./.docker/data/certs:/etc/nginx/certs:ro
     depends_on:
       - php

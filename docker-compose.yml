@@ -1,7 +1,7 @@
 services:
   php:
     build:
-      context: ./docker/php
+      context: ./.docker/php
     container_name: luckygame_php
     volumes:
       - ./src:/var/www/html
@@ -37,7 +37,7 @@ services:
       - NGINX_ENVSUBST_FILTER=^DOMAIN$
     volumes:
       - ./src:/var/www/html
-      - ./docker/nginx/default.conf.template:/etc/nginx/templates/default.conf.template
+      - ./.docker/nginx/default.conf.template:/etc/nginx/templates/default.conf.template
     depends_on:
       - php
     networks:
