@@ -30,14 +30,21 @@ fi
 if ! grep -q "^APP_KEY=:" .env; then
     echo "Generating application key..."
     php artisan key:generate --force
+else
+    echo "Application key exists; skipping generation"
 fi
 
-echo "Creating storage link..."
-php artisan storage:link
+if [ ! -L "/var/www/html/public/storage" ]; then
+    echo "Creating storage link..."
+    php artisan storage:link
+else
+    echo "Storage link exists; skipping creation"
+fi
 
 echo "Running migrations…"
 php artisan migrate --force
 
+echo "Caching configuration, routes, and views…"
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
