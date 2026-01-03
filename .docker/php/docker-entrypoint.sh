@@ -3,11 +3,13 @@ set -e
 
 # Fix permissions for storage and cache directories
 if [ -d "/var/www/html/storage" ]; then
-    chmod -R 777 /var/www/html/storage
+    chown -R www-data:www-data /var/www/html/storage
+    chmod -R 775 /var/www/html/storage
 fi
 
 if [ -d "/var/www/html/bootstrap/cache" ]; then
-    chmod -R 777 /var/www/html/bootstrap/cache
+    chown -R www-data:www-data /var/www/html/bootstrap/cache
+    chmod -R 775 /var/www/html/bootstrap/cache
 fi
 
 # Check if .env file exists, and copy .env.example to .env if not
@@ -19,15 +21,26 @@ else
 fi
 
 echo "Composer install..."
-composer install
+if [ "$APP_ENV" = "production" ]; then
+    composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-dev
+else
+    composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
+fi
 
-echo "Generating application key..."
-php artisan key:generate
+if ! grep -q "^APP_KEY=:" .env; then
+    echo "Generating application key..."
+    php artisan key:generate --force
+fi
 
+echo "Creating storage link..."
 php artisan storage:link
 
 echo "Running migrations…"
-php artisan migrate
+php artisan migrate --force
+
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 
 # Execute the main container command
 exec "$@"
