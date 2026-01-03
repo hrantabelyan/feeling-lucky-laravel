@@ -1,0 +1,101 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      APP_ENV: testing
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.5.0'
+        extensions: mbstring, bcmath, mysql, intl, gd, zip, pcntl, exif, redis, imagick
+        coverage: none
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        cache-dependency-path: ./src/package-lock.json
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Install NPM dependencies
+      run: npm ci
+
+    - name: Build assets
+      run: npm run build
+
+    - name: Copy .env
+      run: cp .env.example .env
+
+    - name: Generate app key
+      run: php artisan key:generate
+
+    - name: Link storage
+      run: php artisan storage:link
+
+    # 1. Syntax check
+    - name: PHP Syntax Check
+      run: find . -path ./vendor -prune -o -type f -name "*.php" -print | xargs -P 4 -n 1 php -l
+
+    # 2. Code style formatting
+    - name: Check code style (Pint)
+      run: ./vendor/bin/pint --test
+
+    # 3. Static analysis
+    - name: Static analysis (Larastan)
+      run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+    # 4. Migrate and seed database
+    - name: Run migrations and seeds
+      run: |
+        php artisan migrate --force
+        php artisan db:seed --force
+
+    # 5. Run tests
+    - name: Run tests
+      run: php artisan test --no-tty
+
+    # 6. Security audit
+    - name: Run security audit
+      run: composer audit
+
+    # TODO: Add deployment
+    # 7. Deploy the app
+    #- name: Deploy to production
+    #  if: github.ref == 'refs/heads/main' && success()
+    #  run: ssh user@your-server "cd /var/www/your-app && git pull origin main && php artisan migrate --force"
