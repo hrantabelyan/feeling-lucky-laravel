@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasVersion4Uuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
@@ -26,7 +25,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class GameLink extends Model
 {
     use HasFactory, HasVersion4Uuids, SoftDeletes;
-    //
+
     protected $fillable = [
         'user_id',
         'token',
@@ -55,7 +54,7 @@ class GameLink extends Model
     public function scopeValid(Builder $query): void
     {
         $query->where('is_active', true)
-              ->where('expired_at', '>', now());
+            ->where('expired_at', '>', now());
     }
 
     public function getRouteKeyName(): string

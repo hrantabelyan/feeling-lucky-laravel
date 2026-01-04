@@ -12,21 +12,21 @@ class UserTest extends TestCase
 
     public function test_user_has_fillable_attributes(): void
     {
-        $user = new User();
+        $user = new User;
         $this->assertEquals(['username', 'phonenumber'], $user->getFillable());
     }
 
     public function test_user_hides_attributes(): void
     {
-        $user = new User();
+        $user = new User;
         $this->assertEquals(['password', 'remember_token'], $user->getHidden());
     }
 
     public function test_user_casts_attributes(): void
     {
-        $user = new User();
+        $user = new User;
         $casts = $user->getCasts();
-        
+
         $this->assertEquals('datetime', $casts['created_at']);
         $this->assertEquals('datetime', $casts['updated_at']);
         $this->assertEquals('datetime', $casts['deleted_at']);

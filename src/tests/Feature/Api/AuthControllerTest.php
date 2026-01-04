@@ -29,7 +29,7 @@ class AuthControllerTest extends TestCase
             'username' => 'testuser',
             'phonenumber' => '+1234567890',
         ]);
-        
+
         $this->assertDatabaseCount('game_links', 1);
     }
 
@@ -57,7 +57,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertCreated();
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'phonenumber' => '+2222222222',

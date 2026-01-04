@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\Eloquent\UserRepository;
 use App\Repositories\Contracts\GameLinkRepositoryInterface;
-use App\Repositories\Eloquent\GameLinkRepository;
 use App\Repositories\Contracts\GameResultRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Eloquent\GameLinkRepository;
 use App\Repositories\Eloquent\GameResultRepository;
+use App\Repositories\Eloquent\UserRepository;
+use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
 {

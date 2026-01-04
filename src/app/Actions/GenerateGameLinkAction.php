@@ -2,11 +2,11 @@
 
 namespace App\Actions;
 
-use App\Repositories\Contracts\GameLinkRepositoryInterface;
-use App\Models\User;
 use App\Models\GameLink;
-use Illuminate\Support\Str;
+use App\Models\User;
+use App\Repositories\Contracts\GameLinkRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class GenerateGameLinkAction
 {

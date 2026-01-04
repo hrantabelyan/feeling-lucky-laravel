@@ -14,15 +14,15 @@ class GameResultTest extends TestCase
 
     public function test_game_result_has_fillable_attributes(): void
     {
-        $result = new GameResult();
+        $result = new GameResult;
         $this->assertEquals(['user_id', 'game_link_id', 'random_number', 'result', 'win_amount'], $result->getFillable());
     }
 
     public function test_game_result_casts_attributes(): void
     {
-        $result = new GameResult();
+        $result = new GameResult;
         $casts = $result->getCasts();
-        
+
         $this->assertEquals('boolean', $casts['result']);
         $this->assertEquals('datetime', $casts['created_at']);
         $this->assertEquals('datetime', $casts['updated_at']);

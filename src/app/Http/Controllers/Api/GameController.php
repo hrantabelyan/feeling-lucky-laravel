@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\DeactivateGameLinkAction;
+use App\Actions\PlayGameAction;
+use App\Actions\RegenerateGameLinkAction;
 use App\Http\Controllers\Controller;
-use App\Models\GameLink;
 use App\Http\Resources\GameLinkResource;
 use App\Http\Resources\GameResultResource;
 use App\Http\Resources\GameResultResourceCollection;
-use App\Actions\PlayGameAction;
-use App\Actions\RegenerateGameLinkAction;
-use App\Actions\DeactivateGameLinkAction;
+use App\Models\GameLink;
 use App\Repositories\Contracts\GameResultRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 
@@ -27,8 +27,8 @@ class GameController extends Controller
         return $this->respondWithSuccess([
             'valid' => true,
             'data' => [
-               'username' => $token->user->username
-            ]
+                'username' => $token->user->username,
+            ],
         ]);
     }
 
@@ -39,6 +39,7 @@ class GameController extends Controller
         } catch (\Exception $e) {
             return $this->respondError($e->getMessage(), $e->getCode());
         }
+
         return $this->respondCreated(new GameResultResource($gameResult));
     }
 
@@ -49,6 +50,7 @@ class GameController extends Controller
         } catch (\Exception $e) {
             return $this->respondError($e->getMessage(), $e->getCode());
         }
+
         return new GameResultResourceCollection($history);
     }
 
@@ -59,7 +61,7 @@ class GameController extends Controller
         } catch (\Exception $e) {
             return $this->respondError($e->getMessage(), $e->getCode());
         }
-        
+
         return $this->respondCreated(new GameLinkResource($updatedLink));
     }
 

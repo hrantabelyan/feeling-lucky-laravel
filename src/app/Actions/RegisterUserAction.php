@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
-use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Models\User;
+use App\Repositories\Contracts\UserRepositoryInterface;
 
 class RegisterUserAction
 {
@@ -21,6 +21,7 @@ class RegisterUserAction
                 if ($user->phonenumber !== $phonenumber) {
                     $this->userRepository->update($user, ['phonenumber' => $phonenumber]);
                 }
+
                 return $user;
             }
 

@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasVersion4Uuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
@@ -24,7 +23,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class GameResult extends Model
 {
     use HasFactory, HasVersion4Uuids, SoftDeletes;
-    //
+
     protected $fillable = [
         'user_id',
         'game_link_id',

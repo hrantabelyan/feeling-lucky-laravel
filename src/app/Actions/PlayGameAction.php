@@ -2,9 +2,9 @@
 
 namespace App\Actions;
 
-use App\Repositories\Contracts\GameResultRepositoryInterface;
 use App\Models\GameLink;
 use App\Models\GameResult;
+use App\Repositories\Contracts\GameResultRepositoryInterface;
 
 class PlayGameAction
 {
@@ -33,8 +33,8 @@ class PlayGameAction
                 $winAmount = $number * config('app.game_win_multipliers.default', 0.10);
             }
         }
-        
-        $finalAmount = (int)($winAmount * 100);
+
+        $finalAmount = (int) ($winAmount * 100);
 
         return $this->gameResultRepository->create($link, [
             'user_id' => $link->user_id,

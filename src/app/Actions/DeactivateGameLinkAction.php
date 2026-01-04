@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
-use App\Repositories\Contracts\GameLinkRepositoryInterface;
 use App\Models\GameLink;
+use App\Repositories\Contracts\GameLinkRepositoryInterface;
 
 class DeactivateGameLinkAction
 {

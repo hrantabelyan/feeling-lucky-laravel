@@ -4,7 +4,6 @@ namespace Tests\Feature\Api;
 
 use App\Models\GameLink;
 use App\Models\GameResult;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -17,7 +16,7 @@ class GameControllerTest extends TestCase
     {
         $token = 'valid-token';
         $hashedToken = hash('sha256', $token);
-        
+
         $link = GameLink::factory()->create([
             'token' => $hashedToken,
         ]);
@@ -28,8 +27,8 @@ class GameControllerTest extends TestCase
             ->assertJson([
                 'valid' => true,
                 'data' => [
-                    'username' => $link->user->username
-                ]
+                    'username' => $link->user->username,
+                ],
             ]);
     }
 
@@ -71,7 +70,7 @@ class GameControllerTest extends TestCase
         $link = GameLink::factory()->create([
             'token' => $hashedToken,
         ]);
-        
+
         GameResult::factory()->count(3)->create(['game_link_id' => $link->id, 'user_id' => $link->user_id]);
 
         $response = $this->getJson("/api/v1/games/{$token}/results");
@@ -98,12 +97,12 @@ class GameControllerTest extends TestCase
                 'is_active',
                 'expired_at',
             ]);
-            
+
         $this->assertDatabaseHas('game_links', [
-            'id' => $link->id, 
-            'is_active' => true 
+            'id' => $link->id,
+            'is_active' => true,
         ]);
-        
+
         // Ensure token changed
         $link->refresh();
         $this->assertNotEquals($hashedToken, $link->token);

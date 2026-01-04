@@ -2,10 +2,10 @@
 
 namespace App\Actions;
 
-use App\Repositories\Contracts\GameLinkRepositoryInterface;
 use App\Models\GameLink;
-use Illuminate\Support\Str;
+use App\Repositories\Contracts\GameLinkRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class RegenerateGameLinkAction
 {

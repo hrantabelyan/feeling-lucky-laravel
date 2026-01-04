@@ -13,15 +13,15 @@ class GameLinkTest extends TestCase
 
     public function test_game_link_has_fillable_attributes(): void
     {
-        $link = new GameLink();
+        $link = new GameLink;
         $this->assertEquals(['user_id', 'token', 'expired_at', 'is_active'], $link->getFillable());
     }
 
     public function test_game_link_casts_attributes(): void
     {
-        $link = new GameLink();
+        $link = new GameLink;
         $casts = $link->getCasts();
-        
+
         $this->assertEquals('datetime', $casts['expired_at']);
         $this->assertEquals('datetime', $casts['created_at']);
         $this->assertEquals('datetime', $casts['updated_at']);
