@@ -78,10 +78,7 @@ trait ApiResponseTrait
         );
     }
 
-    /**
-     * @param  array|string|Arrayable|JsonSerializable|Throwable  $errors
-     */
-    public function respondFailedValidation($errors = []): JsonResponse
+    public function respondFailedValidation(array|string|Arrayable|JsonSerializable|Throwable $errors = []): JsonResponse
     {
         if ($errors === []) {
             $errors = ['error' => __('Something went wrong')];
@@ -97,9 +94,6 @@ trait ApiResponseTrait
         );
     }
 
-    /**
-     * @return \Illuminate\Http\Response
-     */
     public function respondNoContent(): Response
     {
         return response()->noContent();
@@ -110,10 +104,7 @@ trait ApiResponseTrait
         return response()->json($data, $code, [], JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * @param  array|Arrayable|JsonSerializable|null  $data
-     */
-    private function morphToArray($data): array
+    private function morphToArray(array|Arrayable|JsonSerializable|null $data): array
     {
         if (is_array($data)) {
             return $data;
