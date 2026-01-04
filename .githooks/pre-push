@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Pre-push hook:
+# 1. PHP Lint (Syntax Check)
+# 2. PHPStan (Static Analysis)
+# 3. Laravel Pint (Style Check & Auto-fix)
+# All run via Docker Compose.
+
+echo "🚀 Running Pre-push Checks..."
+
+# --- 1. PHP Syntax Check ---
+echo "Running PHP Lint..."
+# Use sh -c to pass the wildcard expansion and pipe correctly to the container
+docker compose exec -T php sh -c 'find . \( -path ./vendor -o -path ./node_modules -o -path ./storage -o -path ./bootstrap/cache \) -prune -o -type f -name "*.php" -print | xargs -P 4 -n 1 php -l' > /dev/null
+
+if [ $? -ne 0 ]; then
+    echo "❌ PHP Lint failed! Fix syntax errors."
+    exit 1
+fi
+echo "✅ PHP Lint passed."
+
+# --- 2. PHPStan ---
+echo "Running PHPStan..."
+docker compose exec -T php vendor/bin/phpstan analyse --memory-limit=2G
+
+if [ $? -ne 0 ]; then
+    echo "❌ PHPStan failed! Fix static analysis errors."
+    exit 1
+fi
+echo "✅ PHPStan passed."
+
+# --- 3. Laravel Pint ---
+echo "Running Laravel Pint Style Check..."
+
+# Run Pint in test mode (no changes).
+docker compose exec -T php vendor/bin/pint --test
+
+if [ $? -eq 0 ]; then
+    echo "✅ Style check passed."
+    echo "🎉 All checks passed. Pushing..."
+    exit 0
+fi
+
+echo "❌ Laravel Pint found style issues!"
+
+# Check if we can interact with the user
+if [ -t 0 ] || [ -e /dev/tty ]; then
+    exec < /dev/tty
+    read -p "Do you want to run Pint to fix these issues and commit them? [y/N] " yn
+    case $yn in
+        [Yy]* )
+            echo "Running Pint fix..."
+            docker compose exec -T php vendor/bin/pint
+            
+            echo "Staging all changes..."
+            git add .
+            
+            echo "Committing fixes..."
+            git commit -m "pre-push hook :: fixed code style with Pint"
+            
+            echo "✅ Fixed and committed."
+            echo "ℹ️ You can try to push again."
+            exit 1
+            ;;
+        * )
+            echo "Aborting push. Please fix style issues manually."
+            exit 1
+            ;;
+    esac
+else
+    echo "Cannot interact with user (no TTY). Aborting push."
+    echo "Please run 'docker compose exec -T php vendor/bin/pint' to fix issues."
+    exit 1
+fi
