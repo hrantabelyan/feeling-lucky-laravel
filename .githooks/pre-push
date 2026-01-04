@@ -11,7 +11,7 @@ echo "🚀 Running Pre-push Checks..."
 # --- 1. PHP Syntax Check ---
 echo "Running PHP Lint..."
 # Use sh -c to pass the wildcard expansion and pipe correctly to the container
-docker compose exec -T php sh -c 'find . \( -path ./vendor -o -path ./node_modules -o -path ./storage -o -path ./bootstrap/cache \) -prune -o -type f -name "*.php" -print | xargs -P 4 -n 1 php -l' > /dev/null
+docker compose exec -T php sh -c 'find . \( -path ./vendor -o -path ./node_modules -o -path ./storage -o -path ./bootstrap/cache \) -prune -o -type f -name "*.php" -print | xargs -P 4 -n 1 php -l'
 
 if [ $? -ne 0 ]; then
     echo "❌ PHP Lint failed! Fix syntax errors."
