@@ -6,15 +6,19 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use JsonSerializable;
+use Throwable;
 
 use function response;
 
 trait ApiResponseTrait
 {
-    public function respondNotFound(?string $message = null, ?string $key = 'message'): JsonResponse
+    /**
+     * @param string $message
+     * @param string $key
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function respondNotFound(string $message = 'Not Found!', string $key = 'message'): JsonResponse
     {
-        $message = $message ? $message : 'Not Found!';
-
         return $this->apiResponse(
             [$key => $this->morphMessage($message)],
             Response::HTTP_NOT_FOUND
@@ -22,44 +26,63 @@ trait ApiResponseTrait
     }
 
     /**
-     * @param array|Arrayable|JsonSerializable|null $contents
+     * @param array|Arrayable|JsonSerializable $contents
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function respondWithSuccess($contents = null): JsonResponse
+    public function respondWithSuccess(array|Arrayable|JsonSerializable $contents = []): JsonResponse
     {
-        $contents = $this->morphToArray($contents) ?? [];
+        $contents = $this->morphToArray($contents);
 
         $data = [] === $contents ? ['message' => 1] : $contents;
         return $this->apiResponse($data);
     }
 
-    public function respondOk(?string $message = null): JsonResponse
+    /**
+     * @param string $message
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function respondOk(string $message = 'OK'): JsonResponse
     {
         return $this->respondWithSuccess(['message' => $message]);
     }
 
-    public function respondUnAuthenticated(?string $message = null): JsonResponse
+    /**
+     * @param string $message
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function respondUnAuthenticated(string $message = 'Unauthenticated'): JsonResponse
     {
         return $this->apiResponse(
-            ['error' => $message ?? 'Unauthenticated'],
+            ['error' => $message],
             Response::HTTP_UNAUTHORIZED
         );
     }
 
-    public function respondForbidden(?string $message = null): JsonResponse
+    /**
+     * @param string $message
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function respondForbidden(string $message = 'Forbidden'): JsonResponse
     {
         return $this->apiResponse(
-            ['error' => $message ?? 'Forbidden'],
+            ['error' => $message],
             Response::HTTP_FORBIDDEN
         );
     }
 
-    public function respondError($errors = null, int $code = 0): JsonResponse
+    /**
+     * @param array|string|Arrayable|JsonSerializable|Throwable $errors
+     * @param int $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function respondError(array|string|Arrayable|JsonSerializable|Throwable $errors = [], int $code = 0): JsonResponse
     {
-        $errors ??= [];
-        $errors = $this->morphToArray($errors);
-        $errors = $errors === [] ? ['error' => __('Something went wrong')] : $errors;
-        if (is_string($errors) || $errors instanceof \Exception) {
+        if ($errors === []) {
+            $errors = ['error' => __('Something went wrong')];
+        } elseif (is_string($errors) || $errors instanceof Throwable) {
             $errors = ['error' => $errors];
+        } else {
+            $errors = $this->morphToArray($errors);
         }
 
         if ($code === 0) {
@@ -73,11 +96,11 @@ trait ApiResponseTrait
     }
 
     /**
-     * @param array|Arrayable|JsonSerializable|null $data
+     * @param array|Arrayable|JsonSerializable|Throwable $data
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function respondCreated($data = null): JsonResponse
+    public function respondCreated(array|Arrayable|JsonSerializable|Throwable $data = []): JsonResponse
     {
-        $data ??= [];
         return $this->apiResponse(
             $this->morphToArray($data),
             Response::HTTP_CREATED
@@ -85,17 +108,17 @@ trait ApiResponseTrait
     }
 
     /**
-     * @param string|\Exception $message
-     *
+     * @param array|string|Arrayable|JsonSerializable|Throwable $errors
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondFailedValidation($errors = null): JsonResponse
+    public function respondFailedValidation($errors = []): JsonResponse
     {
-        $errors ??= [];
-        $errors = $this->morphToArray($errors);
-        $errors = $errors === [] ? ['error' => __('Something went wrong')] : $errors;
-        if (is_string($errors) || $errors instanceof \Exception) {
+        if ($errors === []) {
+            $errors = ['error' => __('Something went wrong')];
+        } elseif (is_string($errors) || $errors instanceof Throwable) {
             $errors = ['error' => $errors];
+        } else {
+            $errors = $this->morphToArray($errors);
         }
 
         return $this->apiResponse(
@@ -104,29 +127,19 @@ trait ApiResponseTrait
         );
     }
 
+    /**
+     * @return \Illuminate\Http\Response
+     */
     public function respondNoContent(): Response
     {
         return response()->noContent();
     }
 
-
     /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
+     * @param array $data
+     * @param int $code
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token): JsonResponse
-    {
-        return $this->respondWithSuccess([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
-    }
-
-
     private function apiResponse(array $data, int $code = 200): JsonResponse
     {
         return response()->json($data, $code, [], JSON_UNESCAPED_UNICODE);
@@ -134,10 +147,14 @@ trait ApiResponseTrait
 
     /**
      * @param array|Arrayable|JsonSerializable|null $data
-     * @return array|null
+     * @return array
      */
-    private function morphToArray($data): ?array
+    private function morphToArray($data): array
     {
+        if (is_array($data)) {
+            return $data;
+        }
+
         if ($data instanceof Arrayable) {
             return $data->toArray();
         }
@@ -146,17 +163,15 @@ trait ApiResponseTrait
             return $data->jsonSerialize();
         }
 
-        return $data;
+        return [];
     }
 
     /**
-     * @param string|\Exception $message
+     * @param string|Throwable $message
      * @return string
      */
-    private function morphMessage($message): string
+    private function morphMessage(string|Throwable $message): string
     {
-        return $message instanceof \Exception
-          ? $message->getMessage()
-          : $message;
+        return $message instanceof Throwable ? $message->getMessage() : $message;
     }
 }
